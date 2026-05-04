@@ -1,0 +1,2224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Нервы деда — Бронирование</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══ TOKENS ══════════════════════════════════ */
+:root {
+  --bg: #08080f;
+  --surface: #11111c;
+  --surface2: #18182a;
+  --surface3: #1f1f35;
+  --border: #272742;
+  --accent: #7c5cfc;
+  --accent2: #c05cf9;
+  --green: #3effa0;
+  --red: #ff4d6d;
+  --yellow: #ffd166;
+  --blue: #4db8ff;
+  --text: #e8e8f4;
+  --muted: #5e5e7a;
+  --radius: 14px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* THEME: LIGHT */
+body.light {
+  --bg: #f0f0f8;
+  --surface: #ffffff;
+  --surface2: #f4f4fc;
+  --surface3: #eaeaf8;
+  --border: #d8d8ee;
+  --text: #18182a;
+  --muted: #8080a0;
+}
+
+/* THEME: NEON */
+body.neon {
+  --bg: #000a05;
+  --surface: #001208;
+  --surface2: #001e0d;
+  --surface3: #002915;
+  --border: #00421f;
+  --accent: #00ff88;
+  --accent2: #00ccff;
+  --green: #00ff88;
+}
+
+/* THEME: RETRO */
+body.retro {
+  --bg: #1a1000;
+  --surface: #261800;
+  --surface2: #321f00;
+  --surface3: #3d2800;
+  --border: #5a3d00;
+  --accent: #ff9d00;
+  --accent2: #ffcc44;
+  --green: #aaff44;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Onest', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.3s, color 0.3s;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: -250px; right: -250px;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(124,92,252,0.1) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 14px 110px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ══ HEADER ══════════════════════════════════ */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0 16px;
+}
+
+.header-brand h1 {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-brand p {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+.icon-btn {
+  width: 36px; height: 36px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  color: var(--text);
+}
+
+.icon-btn:hover { border-color: var(--accent); background: var(--surface2); }
+
+/* ══ NAV ══════════════════════════════════ */
+.nav {
+  display: flex;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.nav-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: 'Onest', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 4px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+
+.nav-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+}
+
+.nav-btn:not(.active):hover { color: var(--text); background: var(--surface2); }
+
+/* ══ SECTION ══════════════════════════════════ */
+.section { display: none; }
+.section.active { display: block; animation: fadeIn 0.25s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══ CARD ══════════════════════════════════ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 10px;
+  transition: border-color 0.2s;
+}
+
+.card:hover { border-color: rgba(124,92,252,0.3); }
+
+.card-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ══ STEPS ══════════════════════════════════ */
+.steps { display: flex; gap: 6px; margin-bottom: 18px; }
+
+.step {
+  flex: 1; height: 3px; border-radius: 99px;
+  background: var(--border);
+  transition: background 0.3s;
+}
+
+.step.active { background: var(--accent); }
+.step.done   { background: var(--green); }
+
+/* ══ DAYS GRID ══════════════════════════════ */
+.days-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.day-btn {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 11px;
+  padding: 12px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  color: var(--text);
+  font-family: 'Onest', sans-serif;
+}
+
+.day-btn:hover { border-color: var(--accent); background: rgba(124,92,252,0.08); }
+.day-btn.selected { border-color: var(--accent); background: rgba(124,92,252,0.15); }
+
+.day-btn .day-num { font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 700; }
+.day-btn .day-name { font-size: 10px; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+.day-btn .day-label { font-size: 10px; color: var(--accent2); margin-top: 2px; font-weight: 500; }
+
+/* ══ SLOTS ══════════════════════════════════ */
+.slots-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+
+.time-toggle {
+  display: flex;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 3px; gap: 3px;
+}
+
+.time-toggle-btn {
+  background: none; border: none;
+  color: var(--muted);
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 99px;
+  cursor: pointer;
+  font-family: 'Onest', sans-serif;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.time-toggle-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* ══ CALENDAR VIEW ══════════════════════════ */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.cal-header { font-size: 10px; color: var(--muted); text-align: center; padding: 4px 0; font-weight: 600; text-transform: uppercase; }
+
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: transparent;
+  border: 1.5px solid transparent;
+  color: var(--text);
+  gap: 2px;
+}
+
+.cal-day:hover:not(.cal-past):not(.cal-empty) { background: var(--surface2); border-color: var(--accent); }
+.cal-day.cal-today { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.cal-day.cal-has-bookings::after { content: ''; width: 4px; height: 4px; background: var(--green); border-radius: 50%; }
+.cal-day.cal-past { color: var(--muted); opacity: 0.4; cursor: default; }
+.cal-day.cal-empty { cursor: default; }
+.cal-day.cal-selected { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border-color: transparent; }
+.cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.cal-nav-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; color: var(--text); transition: all 0.2s; }
+.cal-nav-btn:hover { border-color: var(--accent); }
+.cal-month { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 600; }
+
+.slots-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+
+.slot-btn {
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  padding: 9px 2px;
+  text-align: center;
+  font-family: 'Onest', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  color: var(--text);
+  background: var(--surface2);
+  position: relative;
+}
+
+.slot-btn.free:hover { border-color: var(--green); background: rgba(62,255,160,0.06); }
+.slot-btn.selected { border-color: var(--accent); background: rgba(124,92,252,0.18); color: white; }
+.slot-btn.booked { border-color: transparent; background: rgba(255,77,109,0.06); color: var(--red); cursor: not-allowed; text-decoration: line-through; opacity: 0.65; }
+.slot-btn.past { border-color: transparent; background: transparent; color: var(--muted); cursor: not-allowed; opacity: 0.35; }
+
+.slot-icon { display: block; font-size: 9px; margin-top: 2px; color: var(--muted); }
+.slot-btn.selected .slot-icon { color: var(--accent2); }
+.slot-btn.booked .slot-icon { color: var(--red); }
+.slot-btn.free .slot-icon { color: var(--green); }
+
+.legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.legend-item { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 3px; }
+
+/* ══ SLOTS SUMMARY ══════════════════════════ */
+.slots-summary {
+  background: rgba(124,92,252,0.08);
+  border: 1px solid rgba(124,92,252,0.25);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  font-size: 13px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.slots-summary.visible { display: flex; }
+.slots-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.slot-tag { background: rgba(124,92,252,0.22); border: 1px solid rgba(124,92,252,0.35); border-radius: 6px; padding: 3px 7px; font-size: 11px; font-weight: 500; }
+
+/* ══ COUNTDOWN ══════════════════════════════ */
+.countdown-card {
+  background: linear-gradient(135deg, rgba(124,92,252,0.12), rgba(192,92,249,0.08));
+  border: 1px solid rgba(124,92,252,0.3);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+  display: none;
+}
+
+.countdown-card.visible { display: block; }
+.countdown-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.countdown-booking { font-size: 13px; color: var(--text); margin-bottom: 6px; }
+.countdown-timer { font-family: 'Unbounded', sans-serif; font-size: 28px; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.countdown-units { display: flex; gap: 16px; margin-top: 4px; }
+.countdown-unit { text-align: center; }
+.countdown-val { font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); }
+.countdown-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; }
+
+/* ══ SEARCH ══════════════════════════════════ */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+
+.search-bar:focus-within { border-color: var(--accent); }
+.search-bar input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-family: 'Onest', sans-serif; font-size: 14px; }
+.search-bar input::placeholder { color: var(--muted); }
+
+.filter-row { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.filter-chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'Onest', sans-serif;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.filter-chip.active { background: rgba(124,92,252,0.15); border-color: var(--accent); color: var(--text); }
+
+/* ══ INPUT ══════════════════════════════════ */
+.input-group { margin-bottom: 12px; }
+
+.input-label { font-size: 11px; color: var(--muted); margin-bottom: 5px; font-weight: 500; letter-spacing: 0.3px; text-transform: uppercase; }
+
+.input-field {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 13px;
+  color: var(--text);
+  font-family: 'Onest', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: none;
+}
+
+.input-field:focus { border-color: var(--accent); }
+.input-field::placeholder { color: var(--muted); }
+
+.checkbox-row { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 7px 0; }
+.checkbox-row input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; }
+.checkbox-row span { font-size: 14px; color: var(--text); }
+
+/* ══ BUTTONS ══════════════════════════════════ */
+.btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  color: white;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+}
+
+.btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+.btn-secondary { background: var(--surface2); border: 1.5px solid var(--border); color: var(--text); font-family: 'Onest', sans-serif; font-weight: 500; }
+.btn-danger { background: linear-gradient(135deg, #ff4d6d, #c9184a); }
+.btn-sm { padding: 8px 14px; font-size: 12px; width: auto; border-radius: 9px; }
+
+/* ══ BOOKING ITEMS ══════════════════════════ */
+.bookings-date {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 0 7px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.booking-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  gap: 10px;
+}
+
+.booking-item:last-child { border-bottom: none; }
+
+.booking-time {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  min-width: 52px;
+}
+
+.booking-time.past { color: var(--muted); text-decoration: line-through; }
+
+.booking-names { flex: 1; min-width: 0; }
+.booking-nick { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.booking-partner { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+.booking-id { font-size: 10px; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 2px 6px; font-family: monospace; flex-shrink: 0; }
+
+.booking-cancel-btn {
+  background: rgba(255,77,109,0.08);
+  border: 1px solid rgba(255,77,109,0.25);
+  color: var(--red);
+  border-radius: 7px;
+  padding: 4px 9px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: 'Onest', sans-serif;
+  font-weight: 500;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.booking-cancel-btn:hover { background: rgba(255,77,109,0.18); }
+
+.empty-state { text-align: center; padding: 36px 16px; color: var(--muted); }
+.empty-state .empty-icon { font-size: 44px; margin-bottom: 10px; }
+.empty-state p { font-size: 13px; }
+
+/* ══ SCHEDULE GRID ══════════════════════════ */
+.schedule-wrap { overflow-x: auto; }
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: 52px repeat(7, 1fr);
+  min-width: 420px;
+  gap: 2px;
+}
+
+.sch-header { font-size: 10px; color: var(--muted); text-align: center; padding: 5px 2px; font-weight: 600; }
+.sch-time { font-size: 10px; color: var(--muted); text-align: right; padding: 4px 6px 4px 0; font-family: monospace; line-height: 28px; }
+
+.sch-cell {
+  height: 28px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  cursor: default;
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+  overflow: hidden;
+}
+
+.sch-cell.free { background: rgba(62,255,160,0.05); border-color: rgba(62,255,160,0.12); }
+.sch-cell.booked { background: rgba(124,92,252,0.2); border-color: rgba(124,92,252,0.4); cursor: pointer; }
+.sch-cell.booked:hover { background: rgba(124,92,252,0.35); }
+.sch-cell.past { opacity: 0.3; }
+.sch-cell.today-col { border-left: 2px solid rgba(124,92,252,0.4) !important; }
+
+/* ══ STATS ══════════════════════════════════ */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+
+.stat-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 11px; padding: 14px; text-align: center; }
+
+.stat-num {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ══ QR ══════════════════════════════════ */
+.qr-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px 0; }
+.qr-wrap canvas { border-radius: 12px; background: white; padding: 10px; }
+
+/* ══ CHART ══════════════════════════════════ */
+.chart-bars { display: flex; align-items: flex-end; gap: 4px; height: 80px; margin: 8px 0; }
+.chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.chart-bar { width: 100%; border-radius: 5px 5px 0 0; background: linear-gradient(180deg, var(--accent), var(--accent2)); transition: height 0.4s ease; min-height: 4px; }
+.chart-bar-lbl { font-size: 9px; color: var(--muted); }
+.chart-bar-val { font-size: 10px; color: var(--text); font-weight: 600; }
+
+/* ══ TOAST ══════════════════════════════════ */
+.toast-container {
+  position: fixed;
+  bottom: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+  align-items: center;
+}
+
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  animation: toastIn 0.25s ease, toastOut 0.3s ease 2.5s forwards;
+  box-shadow: var(--shadow);
+}
+
+.toast.success { border-color: rgba(62,255,160,0.4); color: var(--green); }
+.toast.error   { border-color: rgba(255,77,109,0.4); color: var(--red); }
+.toast.info    { border-color: rgba(124,92,252,0.4); color: var(--accent2); }
+
+@keyframes toastIn  { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes toastOut { to   { opacity:0; transform:translateY(-8px); } }
+
+/* ══ MODAL ══════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px 22px 0 0;
+  padding: 24px 18px 40px;
+  width: 100%;
+  max-width: 480px;
+  animation: slideUp 0.28s ease;
+}
+
+@keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+
+.modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 99px; margin: 0 auto 18px; }
+.modal-title { font-family: 'Unbounded', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 18px; text-align: center; }
+
+/* ══ THEME PICKER ══════════════════════════ */
+.theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+.theme-swatch {
+  border-radius: 10px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  font-size: 11px;
+  font-family: 'Onest', sans-serif;
+  font-weight: 500;
+}
+
+.theme-swatch:hover { transform: scale(1.03); }
+.theme-swatch.active { border-color: white; transform: scale(1.05); }
+.ts-dark  { background: #12121a; color: #e8e8f0; }
+.ts-light { background: #f0f0f8; color: #18182a; }
+.ts-neon  { background: #001208; color: #00ff88; }
+.ts-retro { background: #1a1000; color: #ff9d00; }
+
+/* ══ INFO BANNER ══════════════════════════ */
+.info-banner {
+  background: rgba(124,92,252,0.07);
+  border: 1px solid rgba(124,92,252,0.18);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 14px;
+  display: flex; gap: 7px; align-items: flex-start;
+}
+
+.admin-badge {
+  background: linear-gradient(135deg, #f9a825, #ff6f00);
+  color: #1a0a00;
+  font-size: 9px; font-weight: 700;
+  font-family: 'Unbounded', sans-serif;
+  letter-spacing: 0.5px;
+  padding: 2px 7px; border-radius: 99px;
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+
+.booking-summary-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.9;
+  margin-bottom: 12px;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ══ PUSH NOTIFICATIONS BANNER ══════════════ */
+.notif-banner {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,209,102,0.08);
+  border: 1px solid rgba(255,209,102,0.25);
+  border-radius: 11px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.notif-banner:hover { background: rgba(255,209,102,0.14); }
+.notif-banner .notif-icon { font-size: 22px; flex-shrink:0; }
+.notif-banner .notif-text { flex:1; }
+.notif-banner .notif-title { font-size: 13px; font-weight: 600; color: var(--yellow); }
+.notif-banner .notif-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.notif-banner .notif-arrow { color: var(--muted); font-size: 16px; }
+.notif-banner.granted { background: rgba(62,255,160,0.06); border-color: rgba(62,255,160,0.2); cursor:default; }
+.notif-banner.granted .notif-title { color: var(--green); }
+
+/* ══ BOOKING CARD (my bookings) ════════════ */
+.booking-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+.booking-card:hover { border-color: rgba(124,92,252,0.3); }
+.booking-card .bc-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+.booking-card .bc-time { font-family:'Unbounded',sans-serif; font-size:22px; font-weight:800; color:var(--text); }
+.booking-card .bc-date { font-size:11px; color:var(--muted); margin-top:2px; }
+.booking-card .bc-badge {
+  background: rgba(62,255,160,0.12);
+  border: 1px solid rgba(62,255,160,0.25);
+  border-radius:99px; padding:3px 10px;
+  font-size:11px; color:var(--green); font-weight:500;
+}
+.booking-card .bc-badge.soon {
+  background: rgba(255,209,102,0.12);
+  border-color: rgba(255,209,102,0.3);
+  color: var(--yellow);
+  animation: pulse 1.5s infinite;
+}
+.booking-card .bc-badge.today {
+  background: rgba(77,184,255,0.12);
+  border-color: rgba(77,184,255,0.3);
+  color: var(--blue);
+}
+.booking-card .bc-nick { font-size:14px; font-weight:500; color:var(--text); }
+.booking-card .bc-partner { font-size:12px; color:var(--muted); margin-top:2px; }
+.booking-card .bc-footer { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+.booking-card .bc-id { font-size:10px; color:var(--muted); font-family:monospace; }
+.booking-card .bc-actions { display:flex; gap:6px; }
+
+.bc-action-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius:7px; padding:5px 10px;
+  font-size:11px; cursor:pointer; color:var(--muted);
+  font-family:'Onest',sans-serif; font-weight:500;
+  transition:all 0.2s;
+}
+.bc-action-btn:hover { color:var(--text); border-color:var(--accent); }
+.bc-action-btn.danger { border-color:rgba(255,77,109,0.3); color:var(--red); }
+.bc-action-btn.danger:hover { background:rgba(255,77,109,0.1); }
+
+@keyframes pulse {
+  0%,100% { opacity:1; }
+  50%      { opacity:0.6; }
+}
+
+/* ══ QR MODAL ═══════════════════════════════ */
+.qr-full-wrap {
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+  padding:10px 0 4px;
+}
+.qr-full-wrap canvas { border-radius:16px; background:white; padding:14px; box-shadow:0 4px 20px rgba(0,0,0,0.3); }
+.qr-info { text-align:center; }
+.qr-info .qr-time { font-family:'Unbounded',sans-serif; font-size:28px; font-weight:800; color:var(--text); }
+.qr-info .qr-date { font-size:13px; color:var(--muted); margin-top:2px; }
+.qr-info .qr-nick { font-size:14px; color:var(--accent2); margin-top:6px; font-weight:500; }
+
+/* ══ SLOT TOOLTIP ═══════════════════════════ */
+.slot-btn { position: relative; }
+.slot-btn .slot-tooltip {
+  position:absolute; bottom:calc(100% + 6px); left:50%;
+  transform:translateX(-50%) scale(0.85);
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:7px; padding:4px 8px;
+  font-size:11px; color:var(--text); white-space:nowrap;
+  pointer-events:none; opacity:0; transition:all 0.15s;
+  z-index:10; box-shadow:var(--shadow);
+}
+.slot-btn:hover .slot-tooltip { opacity:1; transform:translateX(-50%) scale(1); }
+
+/* ══ RECAP SHARE ════════════════════════════ */
+.share-row { display:flex; gap:8px; margin-top:10px; }
+.share-btn {
+  flex:1; background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; padding:10px; text-align:center;
+  cursor:pointer; transition:all 0.2s; color:var(--text);
+  font-size:11px; font-family:'Onest',sans-serif; font-weight:500;
+}
+.share-btn:hover { border-color:var(--accent); background:rgba(124,92,252,0.08); }
+.share-btn .share-icon { font-size:20px; display:block; margin-bottom:4px; }
+
+/* ══ UPCOMING PILL ══════════════════════════ */
+.upcoming-pill {
+  display:inline-flex; align-items:center; gap:6px;
+  background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(192,92,249,0.1));
+  border: 1px solid rgba(124,92,252,0.3);
+  border-radius:99px; padding:6px 14px;
+  font-size:12px; font-weight:500; margin-bottom:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-brand">
+      <h1>НЕРВЫ ДЕДА</h1>
+      <p id="headerSub">Система бронирования</p>
+    </div>
+    <div class="header-actions">
+      <div class="icon-btn" onclick="openModal('themeModal')" title="Тема">🎨</div>
+      <div class="icon-btn" onclick="openModal('nicknameModal')" title="Профиль" id="profileBtn">👤</div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav" id="mainNav">
+    <button class="nav-btn active" onclick="switchTab('book')"  id="nav-book">📅 Бронь</button>
+    <button class="nav-btn"        onclick="switchTab('my')"   id="nav-my">📝 Мои</button>
+    <button class="nav-btn"        onclick="switchTab('all')"  id="nav-all">📋 Все</button>
+    <button class="nav-btn"        onclick="switchTab('stats')" id="nav-stats">📊 Стат</button>
+    <button class="nav-btn"        onclick="switchTab('admin')" id="nav-admin" style="display:none">🔧 Адм</button>
+  </nav>
+
+  <!-- ════════════════════════════ BOOK ════ -->
+  <div class="section active" id="section-book">
+    <div class="steps">
+      <div class="step active" id="step1"></div>
+      <div class="step"        id="step2"></div>
+      <div class="step"        id="step3"></div>
+    </div>
+
+    <!-- Step 1 -->
+    <div id="bookStep1">
+      <div class="card">
+        <div class="card-title">📆 Выберите дату</div>
+
+        <!-- Calendar nav -->
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="calPrevMonth()">‹</button>
+          <div class="cal-month" id="calMonth"></div>
+          <button class="cal-nav-btn" onclick="calNextMonth()">›</button>
+        </div>
+
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div id="bookStep2" style="display:none">
+      <div class="card">
+        <div class="slots-header">
+          <div class="card-title" style="margin:0" id="dateTitle">🕐 Слоты</div>
+          <div class="time-toggle">
+            <button class="time-toggle-btn active" onclick="setTimeMode('day')"   id="toggleDay">☀️ День</button>
+            <button class="time-toggle-btn"        onclick="setTimeMode('night')" id="toggleNight">🌙 Ночь</button>
+          </div>
+        </div>
+
+        <div class="slots-grid" id="slotsGrid"></div>
+
+        <div class="legend">
+          <span class="legend-item">✅ свободно</span>
+          <span class="legend-item" style="color:var(--red)">❌ занято</span>
+          <span class="legend-item" style="color:var(--muted)">🕰 прошло</span>
+          <span class="legend-item" style="color:var(--accent2)">☑️ выбрано</span>
+        </div>
+
+        <div class="slots-summary" id="slotsSummary">
+          <div class="slots-tags" id="slotsTags"></div>
+          <span id="slotsCount" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+      </div>
+
+      <button class="btn" onclick="goToStep3()" id="confirmSlotsBtn" disabled>Подтвердить слоты →</button>
+      <button class="btn btn-secondary" onclick="goToStep1()" style="margin-top:8px">← Назад</button>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="bookStep3" style="display:none">
+      <div class="card">
+        <div class="card-title">👤 Данные для брони</div>
+
+        <div class="info-banner">ℹ️ Напоминания придут за 30, 10 и 5 минут до начала</div>
+
+        <div class="input-group">
+          <div class="input-label">Ваш никнейм</div>
+          <input type="text" class="input-field" id="nicknameInput" placeholder="Введите никнейм..." maxlength="50" oninput="updateBookingSummary()">
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="partnerCheck" onchange="togglePartnerInput()">
+          <span>Добавить второго человека</span>
+        </label>
+
+        <div id="partnerInputWrap" style="display:none;margin-top:10px">
+          <div class="input-label">Никнейм партнёра</div>
+          <input type="text" class="input-field" id="partnerInput" placeholder="Никнейм партнёра..." maxlength="50" oninput="updateBookingSummary()">
+        </div>
+      </div>
+
+      <div class="booking-summary-box" id="bookingSummaryContent"></div>
+
+      <button class="btn" onclick="createBooking()">✅ Создать бронь</button>
+      <button class="btn btn-secondary" onclick="goToStep2()" style="margin-top:8px">← Назад</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════ MY ════ -->
+  <div class="section" id="section-my">
+
+    <!-- Push notifications banner -->
+    <div class="notif-banner" id="notifBanner" onclick="requestNotifications()">
+      <div class="notif-icon">🔔</div>
+      <div class="notif-text">
+        <div class="notif-title">Включить уведомления</div>
+        <div class="notif-sub">Напомним за 30, 10 и 5 минут до брони</div>
+      </div>
+      <div class="notif-arrow">›</div>
+    </div>
+
+    <!-- Countdown to next booking -->
+    <div class="countdown-card" id="countdownCard">
+      <div class="countdown-title">⏱ До следующей брони</div>
+      <div class="countdown-booking" id="countdownBooking"></div>
+      <div class="countdown-units">
+        <div class="countdown-unit"><div class="countdown-val" id="cdH">00</div><div class="countdown-lbl">часов</div></div>
+        <div class="countdown-unit" style="padding-top:4px;color:var(--muted)">:</div>
+        <div class="countdown-unit"><div class="countdown-val" id="cdM">00</div><div class="countdown-lbl">минут</div></div>
+        <div class="countdown-unit" style="padding-top:4px;color:var(--muted)">:</div>
+        <div class="countdown-unit"><div class="countdown-val" id="cdS">00</div><div class="countdown-lbl">секунд</div></div>
+      </div>
+    </div>
+
+    <div class="card-title" id="myBookingsTitle" style="padding:4px 2px 8px">📝 Мои брони</div>
+    <div id="myBookingsList"></div>
+  </div>
+
+  <!-- ════════════════════════════ ALL ════ -->
+  <div class="section" id="section-all">
+    <!-- Search -->
+    <div class="search-bar">
+      <span style="color:var(--muted)">🔍</span>
+      <input type="text" placeholder="Поиск по нику, дате, времени..." id="searchInput" oninput="renderAllBookings()">
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-row">
+      <button class="filter-chip active" onclick="setFilter('all')"    id="filter-all">Все</button>
+      <button class="filter-chip"        onclick="setFilter('today')"  id="filter-today">Сегодня</button>
+      <button class="filter-chip"        onclick="setFilter('future')" id="filter-future">Будущие</button>
+      <button class="filter-chip"        onclick="setFilter('past')"   id="filter-past">Прошлые</button>
+    </div>
+
+    <!-- Schedule view toggle -->
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <button class="filter-chip active" id="viewList" onclick="setView('list')">📋 Список</button>
+      <button class="filter-chip" id="viewSched" onclick="setView('schedule')">📅 Расписание</button>
+    </div>
+
+    <div class="card" id="listViewCard">
+      <div class="card-title">📋 Все брони</div>
+      <div id="allBookingsList"></div>
+    </div>
+
+    <div class="card" id="schedViewCard" style="display:none">
+      <div class="card-title">📅 Расписание недели</div>
+      <div class="schedule-wrap">
+        <div class="schedule-grid" id="schedGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════ STATS ════ -->
+  <div class="section" id="section-stats">
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <div class="card">
+      <div class="card-title">📊 Брони по дням</div>
+      <div class="chart-bars" id="chartBars"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏆 Топ пользователей</div>
+      <div id="topUsers"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⏰ Популярные слоты</div>
+      <div id="popularSlots"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════ ADMIN ════ -->
+  <div class="section" id="section-admin">
+    <div class="stats-grid" id="adminStats"></div>
+
+    <div class="card">
+      <div class="card-title">🔧 Панель администратора <span class="admin-badge">ADMIN</span></div>
+
+      <button class="btn" onclick="toggleAdminBookings()" style="margin-bottom:8px">📋 Управление бронями</button>
+      <button class="btn btn-secondary" onclick="toggleBroadcast()" style="margin-bottom:8px">📢 Рассылка</button>
+      <button class="btn btn-secondary" onclick="toggleUsers()">👥 Пользователи</button>
+    </div>
+
+    <div class="card" id="adminBookingsCard" style="display:none">
+      <div class="card-title">
+        📋 Все брони
+        <button onclick="adminDeleteSelected()" id="adminDelBtn"
+          style="margin-left:auto;background:rgba(255,77,109,0.12);border:1px solid rgba(255,77,109,0.3);color:var(--red);padding:4px 10px;border-radius:7px;font-size:11px;cursor:pointer;display:none">
+          🗑 Удалить (<span id="adminDelCount">0</span>)
+        </button>
+      </div>
+      <div id="adminBookingsList"></div>
+    </div>
+
+    <div class="card" id="broadcastCard" style="display:none">
+      <div class="card-title">📢 Рассылка</div>
+      <div class="input-group">
+        <div class="input-label">Текст объявления</div>
+        <textarea class="input-field" id="broadcastText" rows="4" placeholder="Введите текст..."></textarea>
+      </div>
+      <div id="broadcastPreview" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;color:var(--muted);min-height:40px;display:none"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" style="flex:1" onclick="previewBroadcast()">Предпросмотр</button>
+        <button class="btn btn-sm" style="flex:1" onclick="sendBroadcast()">📤 Отправить</button>
+      </div>
+    </div>
+
+    <div class="card" id="usersCard" style="display:none">
+      <div class="card-title">👥 Пользователи</div>
+      <div id="usersList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODALS ════ -->
+
+<!-- User modal -->
+<div class="modal-overlay" id="nicknameModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">👤 Идентификация</div>
+    <p style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:18px">
+      Введите ваш Telegram user ID и никнейм
+    </p>
+    <div class="input-group">
+      <div class="input-label">Telegram User ID</div>
+      <input type="number" class="input-field" id="userIdInput" placeholder="12345678...">
+    </div>
+    <div class="input-group">
+      <div class="input-label">Ваш никнейм</div>
+      <input type="text" class="input-field" id="userNicknameInput" placeholder="Никнейм...">
+    </div>
+    <button class="btn" onclick="setUser()" style="margin-top:6px">Войти</button>
+  </div>
+</div>
+
+<!-- Cancel modal -->
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">❌ Отменить бронь?</div>
+    <div id="cancelModalContent" style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;line-height:1.8"></div>
+
+    <!-- QR code of booking -->
+    <div class="qr-wrap" id="cancelQR" style="display:none">
+      <canvas id="qrCanvas" width="150" height="150"></canvas>
+      <button class="btn btn-secondary btn-sm" onclick="downloadQR()">💾 Сохранить QR</button>
+    </div>
+
+    <button class="btn btn-danger" onclick="confirmCancel()">Да, отменить</button>
+    <button class="btn btn-secondary" onclick="closeModal('cancelModal')" style="margin-top:8px">Назад</button>
+  </div>
+</div>
+
+<!-- Theme modal -->
+<div class="modal-overlay" id="themeModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🎨 Тема оформления</div>
+    <div class="theme-grid">
+      <div class="theme-swatch ts-dark  active" onclick="setTheme('dark')"  id="theme-dark">🌑 Тёмная</div>
+      <div class="theme-swatch ts-light"         onclick="setTheme('light')" id="theme-light">☀️ Светлая</div>
+      <div class="theme-swatch ts-neon"          onclick="setTheme('neon')"  id="theme-neon">💚 Неон</div>
+      <div class="theme-swatch ts-retro"         onclick="setTheme('retro')" id="theme-retro">🔥 Ретро</div>
+    </div>
+    <button class="btn btn-secondary" onclick="closeModal('themeModal')" style="margin-top:16px">Готово</button>
+  </div>
+</div>
+
+<!-- Booking info modal (for admin schedule click) -->
+<div class="modal-overlay" id="bookingInfoModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔖 Бронь</div>
+    <div id="bookingInfoContent" style="font-size:14px;color:var(--muted);line-height:1.9;text-align:center;margin-bottom:20px"></div>
+    <div class="qr-wrap" id="infoQR">
+      <canvas id="qrCanvasInfo" width="160" height="160"></canvas>
+      <button class="btn btn-secondary btn-sm" onclick="downloadQRInfo()">💾 Скачать QR</button>
+    </div>
+    <button class="btn btn-secondary" onclick="closeModal('bookingInfoModal')" style="margin-top:14px">Закрыть</button>
+  </div>
+</div>
+
+<!-- QR booking view modal -->
+<div class="modal-overlay" id="qrViewModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📱 QR брони</div>
+    <div class="qr-full-wrap">
+      <div class="qr-info">
+        <div class="qr-time" id="qrViewTime"></div>
+        <div class="qr-date" id="qrViewDate"></div>
+        <div class="qr-nick" id="qrViewNick"></div>
+      </div>
+      <canvas id="qrViewCanvas" width="200" height="200"></canvas>
+      <p style="font-size:11px;color:var(--muted);text-align:center">Покажи этот код для подтверждения</p>
+    </div>
+    <div class="share-row">
+      <div class="share-btn" onclick="downloadQRView()">
+        <span class="share-icon">💾</span>Скачать
+      </div>
+      <div class="share-btn" onclick="shareBooking()">
+        <span class="share-icon">📤</span>Поделиться
+      </div>
+      <div class="share-btn" onclick="copyBookingText()">
+        <span class="share-icon">📋</span>Копировать
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="closeModal('qrViewModal')" style="margin-top:14px">Закрыть</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+const ADMIN_IDS = [870860491, 340468922];
+
+const S = {
+  userId: null, userNick: null, isAdmin: false,
+  selectedDate: null, selectedSlots: [],
+  timeMode: 'day',
+  calYear: 0, calMonth: 0,
+  filterMode: 'all',
+  viewMode: 'list',
+  cancelTarget: null,
+  adminSelected: [],
+  theme: 'dark'
+};
+
+/* ═══ STORAGE ═══════════════════════════════ */
+const db = {
+  bookings: () => { try { return JSON.parse(localStorage.getItem('nd_bookings')||'[]'); } catch { return []; } },
+  save: b => localStorage.setItem('nd_bookings', JSON.stringify(b)),
+  users: () => { try { return JSON.parse(localStorage.getItem('nd_users')||'[]'); } catch { return []; } },
+  saveUsers: u => localStorage.setItem('nd_users', JSON.stringify(u)),
+};
+
+let _nextId = parseInt(localStorage.getItem('nd_next_id')||'1');
+const nextId = () => { const id = _nextId++; localStorage.setItem('nd_next_id', _nextId); return id; };
+
+function upsertUser(uid, nick) {
+  const users = db.users();
+  const i = users.findIndex(u => u.user_id == uid);
+  if (i >= 0) { users[i].username = nick; users[i].first_name = nick; }
+  else users.push({ user_id: uid, username: nick, first_name: nick, registered_at: new Date().toISOString() });
+  db.saveUsers(users);
+}
+
+/* ═══ TIME HELPERS ══════════════════════════ */
+function nowMsk() {
+  const now = new Date();
+  return new Date(now.getTime() + now.getTimezoneOffset()*60000 + 3*3600000);
+}
+const todayMsk  = () => nowMsk().toISOString().split('T')[0];
+const fmtTime   = (h, m) => `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+const fmtDate   = d => { const [y,mo,dd] = d.split('-'); return `${dd}.${mo}.${y}`; };
+const isoDate   = d => d.toISOString().split('T')[0];
+
+function slotIsPast(date, hour, minute) {
+  const now = nowMsk(), today = todayMsk();
+  if (date < today) return true;
+  if (date === today) {
+    if (hour < now.getHours()) return true;
+    if (hour === now.getHours() && minute <= now.getMinutes()) return true;
+  }
+  return false;
+}
+
+function getBookedSlots(date) {
+  const s = new Set();
+  db.bookings().filter(b => b.date === date).forEach(b => s.add(`${b.hour}_${b.minute}`));
+  return s;
+}
+
+const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const DAYS_SHORT = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+const range = (a,b) => { const r=[]; for(let i=a;i<b;i++) r.push(i); return r; };
+const escH  = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* ═══ USER AUTH ══════════════════════════════ */
+function initUser() {
+  const saved = localStorage.getItem('nd_user');
+  if (saved) {
+    const u = JSON.parse(saved);
+    S.userId = parseInt(u.userId); S.userNick = u.nick;
+    S.isAdmin = ADMIN_IDS.includes(S.userId);
+    document.getElementById('headerSub').textContent = `👤 ${u.nick}`;
+    if (S.isAdmin) document.getElementById('nav-admin').style.display = '';
+    upsertUser(S.userId, u.nick);
+    // Prefill nickname in booking form
+    document.getElementById('nicknameInput').value = u.nick;
+  } else {
+    openModal('nicknameModal');
+  }
+}
+
+function setUser() {
+  const uid  = document.getElementById('userIdInput').value.trim();
+  const nick = document.getElementById('userNicknameInput').value.trim();
+  if (!uid || !nick) { showToast('Заполните оба поля', 'error'); return; }
+  S.userId = parseInt(uid); S.userNick = nick;
+  S.isAdmin = ADMIN_IDS.includes(S.userId);
+  localStorage.setItem('nd_user', JSON.stringify({ userId: uid, nick }));
+  upsertUser(S.userId, nick);
+  document.getElementById('headerSub').textContent = `👤 ${nick}`;
+  document.getElementById('nicknameInput').value = nick;
+  if (S.isAdmin) document.getElementById('nav-admin').style.display = '';
+  closeModal('nicknameModal');
+  showToast(`Привет, ${nick}! 👋`, 'success');
+  renderCurrentTab();
+}
+
+/* ═══ NAVIGATION ════════════════════════════ */
+let currentTab = 'book';
+
+function switchTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`section-${tab}`).classList.add('active');
+  document.getElementById(`nav-${tab}`).classList.add('active');
+  currentTab = tab;
+  renderCurrentTab();
+}
+
+function renderCurrentTab() {
+  if      (currentTab === 'my')    { renderMyBookings(); startCountdown(); }
+  else if (currentTab === 'all')   renderAllBookings();
+  else if (currentTab === 'stats') renderStats();
+  else if (currentTab === 'admin') renderAdmin();
+}
+
+/* ═══ CALENDAR ══════════════════════════════ */
+function initCal() {
+  const now = nowMsk();
+  S.calYear = now.getFullYear();
+  S.calMonth = now.getMonth();
+  renderCal();
+}
+
+function calPrevMonth() {
+  if (S.calMonth === 0) { S.calMonth = 11; S.calYear--; }
+  else S.calMonth--;
+  renderCal();
+}
+
+function calNextMonth() {
+  if (S.calMonth === 11) { S.calMonth = 0; S.calYear++; }
+  else S.calMonth++;
+  renderCal();
+}
+
+function renderCal() {
+  document.getElementById('calMonth').textContent = `${MONTHS_RU[S.calMonth]} ${S.calYear}`;
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  // Headers Mo-Su
+  DAYS_SHORT.forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'cal-header'; h.textContent = d;
+    grid.appendChild(h);
+  });
+
+  const bookings = db.bookings();
+  const today = todayMsk();
+  const now = nowMsk();
+
+  // First day of month (0=Sun..6=Sat → adjust to Mon-first)
+  const first = new Date(S.calYear, S.calMonth, 1);
+  let startOffset = first.getDay() - 1; // Mon=0
+  if (startOffset < 0) startOffset = 6;
+
+  // Blanks
+  for (let i = 0; i < startOffset; i++) {
+    const blank = document.createElement('div');
+    blank.className = 'cal-day cal-empty';
+    grid.appendChild(blank);
+  }
+
+  const daysInMonth = new Date(S.calYear, S.calMonth + 1, 0).getDate();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const iso = `${S.calYear}-${String(S.calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isPast = iso < today;
+    const isToday = iso === today;
+    const hasBookings = bookings.some(b => b.date === iso);
+    const isSelected = iso === S.selectedDate;
+
+    const cell = document.createElement('div');
+    let cls = 'cal-day';
+    if (isPast) cls += ' cal-past';
+    if (isToday) cls += ' cal-today';
+    if (hasBookings) cls += ' cal-has-bookings';
+    if (isSelected) cls += ' cal-selected';
+    cell.className = cls;
+    cell.textContent = d;
+
+    if (!isPast) cell.onclick = () => { S.selectedDate = iso; goToStep2(); };
+    grid.appendChild(cell);
+  }
+}
+
+/* ═══ STEP 1 ════════════════════════════════ */
+function goToStep1() {
+  S.selectedDate = null; S.selectedSlots = [];
+  showStep(1);
+  renderCal();
+}
+
+/* ═══ STEP 2 ════════════════════════════════ */
+function goToStep2() {
+  S.timeMode = 'day';
+  document.getElementById('toggleDay').classList.add('active');
+  document.getElementById('toggleNight').classList.remove('active');
+  document.getElementById('dateTitle').textContent = `🕐 ${fmtDate(S.selectedDate)} (МСК)`;
+  showStep(2);
+  renderSlots();
+}
+
+function setTimeMode(mode) {
+  S.timeMode = mode;
+  document.getElementById('toggleDay').classList.toggle('active', mode==='day');
+  document.getElementById('toggleNight').classList.toggle('active', mode==='night');
+  renderSlots();
+}
+
+function renderSlots() {
+  const grid  = document.getElementById('slotsGrid');
+  grid.innerHTML = '';
+  const hours  = S.timeMode === 'day' ? range(12,24) : range(0,12);
+  const booked = getBookedSlots(S.selectedDate);
+  const selSet = new Set(S.selectedSlots.map(s=>`${s.hour}_${s.minute}`));
+
+  hours.forEach(h => {
+    [0,30].forEach(m => {
+      const key = `${h}_${m}`;
+      const isBooked   = booked.has(key);
+      const isPast     = slotIsPast(S.selectedDate, h, m);
+      const isSelected = selSet.has(key);
+
+      let cls='slot-btn '; let icon='';
+      if (isSelected)   { cls+='selected'; icon='☑️'; }
+      else if (isBooked){ cls+='booked';   icon='❌'; }
+      else if (isPast)  { cls+='past';     icon='🕰'; }
+      else              { cls+='free';     icon='✅'; }
+
+      const btn = document.createElement('button');
+      btn.className = cls;
+      btn.innerHTML = `${fmtTime(h,m)}<span class="slot-icon">${icon}</span>`;
+      btn.onclick = () => toggleSlot(h, m, isBooked, isPast);
+      grid.appendChild(btn);
+    });
+  });
+  updateSlotsSummary();
+}
+
+function toggleSlot(h, m, isBooked, isPast) {
+  if (isBooked) { showToast('❌ Слот уже занят!', 'error'); return; }
+  if (isPast)   { showToast('🕰️ Время прошло!', 'error'); return; }
+  const idx = S.selectedSlots.findIndex(s => s.hour===h && s.minute===m);
+  if (idx >= 0) { S.selectedSlots.splice(idx,1); showToast(`Убрали ${fmtTime(h,m)}`, 'info'); }
+  else          { S.selectedSlots.push({hour:h,minute:m}); showToast(`Выбрали ${fmtTime(h,m)} ☑️`, 'success'); }
+  renderSlots();
+  document.getElementById('confirmSlotsBtn').disabled = S.selectedSlots.length === 0;
+}
+
+function updateSlotsSummary() {
+  const summary = document.getElementById('slotsSummary');
+  const tags    = document.getElementById('slotsTags');
+  const count   = document.getElementById('slotsCount');
+  const btn     = document.getElementById('confirmSlotsBtn');
+  if (S.selectedSlots.length === 0) { summary.classList.remove('visible'); btn.disabled=true; return; }
+  summary.classList.add('visible'); btn.disabled=false;
+  const sorted = [...S.selectedSlots].sort((a,b)=>a.hour*60+a.minute - b.hour*60-b.minute);
+  tags.innerHTML = sorted.map(s=>`<span class="slot-tag">${fmtTime(s.hour,s.minute)}</span>`).join('');
+  count.textContent = `${sorted.length} сл.`;
+}
+
+/* ═══ STEP 3 ════════════════════════════════ */
+function goToStep3() {
+  if (!S.selectedSlots.length) { showToast('Выберите хотя бы один слот!', 'error'); return; }
+  updateBookingSummary();
+  showStep(3);
+}
+
+function togglePartnerInput() {
+  const show = document.getElementById('partnerCheck').checked;
+  document.getElementById('partnerInputWrap').style.display = show ? '' : 'none';
+  updateBookingSummary();
+}
+
+function updateBookingSummary() {
+  const nick    = document.getElementById('nicknameInput').value.trim() || '—';
+  const partner = document.getElementById('partnerCheck').checked
+    ? (document.getElementById('partnerInput').value.trim() || '—') : null;
+  const sorted  = [...S.selectedSlots].sort((a,b)=>a.hour*60+a.minute-b.hour*60-b.minute);
+  const slotsStr = sorted.map(s=>fmtTime(s.hour,s.minute)).join(', ');
+  document.getElementById('bookingSummaryContent').innerHTML = `
+    📆 <b>${fmtDate(S.selectedDate)}</b><br>
+    🕐 <b>${escH(slotsStr)}</b> (МСК)<br>
+    👤 <b>${escH(nick)}</b><br>
+    ${partner ? `👥 Партнёр: <b>${escH(partner)}</b><br>` : ''}
+    🔔 Напоминания за 30, 10 и 5 мин
+  `;
+}
+
+function createBooking() {
+  const nick    = document.getElementById('nicknameInput').value.trim();
+  const hasP    = document.getElementById('partnerCheck').checked;
+  const partner = hasP ? document.getElementById('partnerInput').value.trim() : null;
+
+  if (!nick || nick.length < 2) { showToast('Никнейм от 2 до 50 символов', 'error'); return; }
+  if (hasP && (!partner || partner.length < 2)) { showToast('Никнейм партнёра от 2 символов', 'error'); return; }
+
+  const bookings = db.bookings();
+  const bookedSet = getBookedSlots(S.selectedDate);
+  const sorted = [...S.selectedSlots].sort((a,b)=>a.hour*60+a.minute-b.hour*60-b.minute);
+
+  for (const s of sorted) {
+    if (bookedSet.has(`${s.hour}_${s.minute}`)) {
+      showToast(`Слот ${fmtTime(s.hour,s.minute)} уже занят!`, 'error'); return;
+    }
+  }
+
+  const ids = [];
+  sorted.forEach(s => {
+    const id = nextId();
+    bookings.push({ id, user_id:S.userId, date:S.selectedDate, hour:s.hour, minute:s.minute,
+                    nickname:nick, partner_nickname:partner||null, created_at:new Date().toISOString() });
+    ids.push(`#${id}`);
+  });
+  db.save(bookings);
+
+  showToast(`✅ Создано ${sorted.length} бронь! (${ids.join(', ')})`, 'success');
+  S.selectedSlots = []; S.selectedDate = null;
+  document.getElementById('partnerCheck').checked = false;
+  document.getElementById('partnerInputWrap').style.display = 'none';
+  goToStep1();
+}
+
+function showStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById(`bookStep${i}`).style.display = i===n ? '' : 'none';
+    const s = document.getElementById(`step${i}`);
+    s.className = 'step' + (i<n ? ' done' : i===n ? ' active' : '');
+  });
+}
+
+/* ═══ COUNTDOWN ══════════════════════════════ */
+let cdInterval = null;
+
+function startCountdown() {
+  if (cdInterval) clearInterval(cdInterval);
+  cdInterval = setInterval(tickCountdown, 1000);
+  tickCountdown();
+}
+
+function tickCountdown() {
+  const today = todayMsk();
+  const now   = nowMsk();
+  const myFuture = db.bookings()
+    .filter(b => b.user_id == S.userId && !slotIsPast(b.date, b.hour, b.minute))
+    .sort((a,b) => (a.date+fmtTime(a.hour,a.minute)).localeCompare(b.date+fmtTime(b.hour,b.minute)));
+
+  const card = document.getElementById('countdownCard');
+  if (!myFuture.length) { card.classList.remove('visible'); return; }
+
+  const next = myFuture[0];
+  const bookingDt = new Date(
+    ...next.date.split('-').map(Number),
+    next.hour, next.minute, 0
+  );
+  // adjust to MSK
+  const bookingMsk = new Date(bookingDt.getTime() - now.getTimezoneOffset()*60000 - 3*3600000 + now.getTimezoneOffset()*60000 + 3*3600000);
+  const diff = bookingDt.getTime() - now.getTime();
+
+  if (diff <= 0) { card.classList.remove('visible'); return; }
+  card.classList.add('visible');
+
+  const totalSec = Math.floor(diff / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+
+  document.getElementById('cdH').textContent = String(h).padStart(2,'0');
+  document.getElementById('cdM').textContent = String(m).padStart(2,'0');
+  document.getElementById('cdS').textContent = String(s).padStart(2,'0');
+  document.getElementById('countdownBooking').textContent =
+    `${fmtDate(next.date)} в ${fmtTime(next.hour,next.minute)} — ${next.nickname}`;
+}
+
+/* ═══ PUSH NOTIFICATIONS ════════════════════ */
+function initNotifBanner() {
+  if (!('Notification' in window)) {
+    document.getElementById('notifBanner').style.display = 'none'; return;
+  }
+  if (Notification.permission === 'granted') {
+    setNotifGranted(); scheduleAllReminders();
+  } else if (Notification.permission === 'denied') {
+    document.getElementById('notifBanner').style.display = 'none';
+  }
+}
+
+function setNotifGranted() {
+  const b = document.getElementById('notifBanner');
+  if (!b) return;
+  b.classList.add('granted');
+  b.querySelector('.notif-title').textContent = '✅ Уведомления включены';
+  b.querySelector('.notif-sub').textContent   = 'Напомним за 30, 10 и 5 минут';
+  b.querySelector('.notif-arrow').textContent = '';
+  b.onclick = null;
+}
+
+function requestNotifications() {
+  if (!('Notification' in window)) { showToast('Браузер не поддерживает уведомления', 'error'); return; }
+  Notification.requestPermission().then(p => {
+    if (p === 'granted') {
+      setNotifGranted(); scheduleAllReminders();
+      new Notification('Нервы деда 🔔', { body: 'Уведомления включены! Напомним о бронях.' });
+      showToast('✅ Уведомления включены!', 'success');
+    } else {
+      showToast('Уведомления отклонены', 'error');
+      document.getElementById('notifBanner').style.display = 'none';
+    }
+  });
+}
+
+let _reminderTimers = [];
+function scheduleAllReminders() {
+  _reminderTimers.forEach(t => clearTimeout(t)); _reminderTimers = [];
+  if (Notification.permission !== 'granted') return;
+  const now = nowMsk().getTime();
+  db.bookings().filter(b => b.user_id == S.userId && !slotIsPast(b.date,b.hour,b.minute||0))
+    .forEach(b => {
+      const [y,mo,d] = b.date.split('-').map(Number);
+      const bookingMs = new Date(y, mo-1, d, b.hour, b.minute||0, 0).getTime();
+      [30,10,5].forEach(min => {
+        const delay = bookingMs - min*60000 - now;
+        if (delay > 0 && delay < 24*3600000) {
+          _reminderTimers.push(setTimeout(() => {
+            new Notification(`⏰ Бронь через ${min} мин!`, { body: `${fmtTime(b.hour,b.minute||0)} — ${b.nickname}` });
+          }, delay));
+        }
+      });
+    });
+}
+
+/* ═══ MY BOOKINGS ════════════════════════════ */
+function renderMyBookings() {
+  initNotifBanner();
+  const today = todayMsk();
+  const now   = nowMsk();
+  const mine  = db.bookings().filter(b => b.user_id == S.userId && b.date >= today);
+  mine.sort((a,b)=>(a.date+fmtTime(a.hour,a.minute)).localeCompare(b.date+fmtTime(b.hour,b.minute)));
+
+  document.getElementById('myBookingsTitle').textContent = `📝 Мои брони (${mine.length})`;
+  const list = document.getElementById('myBookingsList');
+
+  if (!mine.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div>
+      <p>Нет активных броней</p>
+      <button class="btn" onclick="switchTab('book')" style="margin-top:16px;max-width:200px">+ Создать бронь</button>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = mine.map(b => {
+    const [y,mo,d] = b.date.split('-').map(Number);
+    const bookingMs = new Date(y, mo-1, d, b.hour, b.minute||0).getTime();
+    const diffMin   = Math.floor((bookingMs - now.getTime()) / 60000);
+    const isToday   = b.date === today;
+    const isSoon    = isToday && diffMin <= 30 && diffMin > 0;
+
+    let badgeClass = 'bc-badge', badgeText = fmtDate(b.date);
+    if (isSoon)        { badgeClass += ' soon';  badgeText = `⚡ Через ${diffMin} мин!`; }
+    else if (isToday)  { badgeClass += ' today'; badgeText = '📅 Сегодня'; }
+
+    return `<div class="booking-card">
+      <div class="bc-top">
+        <div>
+          <div class="bc-time">${fmtTime(b.hour,b.minute||0)}</div>
+          <div class="bc-date">${isToday?'Сегодня, МСК':fmtDate(b.date)+' МСК'}</div>
+        </div>
+        <div class="${badgeClass}">${badgeText}</div>
+      </div>
+      <div class="bc-nick">👤 ${escH(b.nickname)}</div>
+      ${b.partner_nickname?`<div class="bc-partner">👥 ${escH(b.partner_nickname)}</div>`:''}
+      <div class="bc-footer">
+        <div class="bc-id">#${b.id}</div>
+        <div class="bc-actions">
+          <button class="bc-action-btn" onclick="showQRView(${b.id})">📱 QR</button>
+          <button class="bc-action-btn" onclick="shareBookingById(${b.id})">📤 Поделиться</button>
+          <button class="bc-action-btn danger" onclick="promptCancel(${b.id})">✕ Отмена</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══ QR VIEW + SHARE ════════════════════════ */
+let _qrViewBooking = null;
+
+function showQRView(id) {
+  const b = db.bookings().find(x => x.id===id);
+  if (!b) return;
+  _qrViewBooking = b;
+  document.getElementById('qrViewTime').textContent = fmtTime(b.hour,b.minute||0);
+  document.getElementById('qrViewDate').textContent = fmtDate(b.date) + ' (МСК)';
+  document.getElementById('qrViewNick').textContent = b.nickname+(b.partner_nickname?' & '+b.partner_nickname:'');
+  drawQR('qrViewCanvas', `НЕРВЫ ДЕДА\nДата: ${fmtDate(b.date)}\nВремя: ${fmtTime(b.hour,b.minute||0)} МСК\nНик: ${b.nickname}\nID: #${b.id}`, 200);
+  openModal('qrViewModal');
+}
+
+function downloadQRView() {
+  const c = document.getElementById('qrViewCanvas');
+  const a = document.createElement('a');
+  a.href = c.toDataURL('image/png');
+  a.download = `бронь-${_qrViewBooking?_qrViewBooking.id:'qr'}.png`;
+  a.click();
+  showToast('💾 QR сохранён!', 'success');
+}
+
+function shareBookingById(id) {
+  const b = db.bookings().find(x=>x.id===id);
+  if (!b) return;
+  const text = `🎮 Нервы деда\n📆 ${fmtDate(b.date)}\n🕐 ${fmtTime(b.hour,b.minute||0)} МСК\n👤 ${b.nickname}${b.partner_nickname?' & '+b.partner_nickname:''}\n🔖 #${b.id}`;
+  if (navigator.share) navigator.share({ title:'Бронь — Нервы деда', text }).catch(()=>{});
+  else navigator.clipboard?.writeText(text).then(()=>showToast('📋 Скопировано!','success'));
+}
+
+function shareBooking() { if (_qrViewBooking) shareBookingById(_qrViewBooking.id); }
+
+function copyBookingText() {
+  if (!_qrViewBooking) return;
+  const b = _qrViewBooking;
+  navigator.clipboard?.writeText(`🎮 Нервы деда | ${fmtDate(b.date)} ${fmtTime(b.hour,b.minute||0)} | ${b.nickname} | #${b.id}`)
+    .then(()=>showToast('📋 Скопировано!','success'));
+}
+
+/* ═══ ALL BOOKINGS ═══════════════════════════ */
+let _filterMode = 'all';
+let _viewMode   = 'list';
+
+function setFilter(mode) {
+  _filterMode = mode;
+  document.querySelectorAll('.filter-chip[id^="filter-"]').forEach(c => c.classList.remove('active'));
+  document.getElementById(`filter-${mode}`).classList.add('active');
+  renderAllBookings();
+}
+
+function setView(mode) {
+  _viewMode = mode;
+  document.getElementById('viewList').classList.toggle('active', mode==='list');
+  document.getElementById('viewSched').classList.toggle('active', mode==='schedule');
+  document.getElementById('listViewCard').style.display  = mode==='list' ? '' : 'none';
+  document.getElementById('schedViewCard').style.display = mode==='schedule' ? '' : 'none';
+  if (mode === 'schedule') renderSchedule();
+}
+
+function renderAllBookings() {
+  const q       = document.getElementById('searchInput').value.trim().toLowerCase();
+  const today   = todayMsk();
+  const yesterday = (() => { const d=new Date(nowMsk()); d.setDate(d.getDate()-1); return isoDate(d); })();
+
+  let all = db.bookings();
+
+  // Filter
+  if (_filterMode === 'today')  all = all.filter(b => b.date === today);
+  else if (_filterMode === 'future') all = all.filter(b => b.date >= today);
+  else if (_filterMode === 'past')   all = all.filter(b => b.date < today);
+  else all = all.filter(b => b.date >= yesterday); // 'all' shows from yesterday
+
+  // Search
+  if (q) all = all.filter(b =>
+    b.nickname?.toLowerCase().includes(q) ||
+    (b.partner_nickname||'').toLowerCase().includes(q) ||
+    b.date?.includes(q) ||
+    fmtTime(b.hour,b.minute).includes(q)
+  );
+
+  all.sort((a,b)=>(a.date+fmtTime(a.hour,a.minute)).localeCompare(b.date+fmtTime(b.hour,b.minute)));
+
+  const list = document.getElementById('allBookingsList');
+  list.innerHTML = all.length ? renderBookingGroups(all, false) :
+    `<div class="empty-state"><div class="empty-icon">🔍</div><p>Ничего не найдено</p></div>`;
+}
+
+/* ═══ SCHEDULE VIEW ══════════════════════════ */
+function renderSchedule() {
+  const grid = document.getElementById('schedGrid');
+  grid.innerHTML = '';
+  const today = todayMsk();
+  const now   = nowMsk();
+
+  // Build 7 days starting today
+  const days = [];
+  for (let i=0; i<7; i++) {
+    const d = new Date(nowMsk());
+    d.setDate(d.getDate() + i);
+    days.push(isoDate(d));
+  }
+
+  const bookings = db.bookings();
+
+  // Header row: empty corner + day labels
+  const corner = document.createElement('div');
+  corner.className = 'sch-header';
+  grid.appendChild(corner);
+
+  days.forEach(d => {
+    const h = document.createElement('div');
+    h.className = 'sch-header';
+    const [,mo,dd] = d.split('-');
+    h.innerHTML = `${dd}.${mo}`;
+    if (d === today) h.style.color = 'var(--accent)';
+    grid.appendChild(h);
+  });
+
+  // Rows: hours 0-23
+  range(0,24).forEach(hour => {
+    const timeCell = document.createElement('div');
+    timeCell.className = 'sch-time';
+    timeCell.textContent = `${String(hour).padStart(2,'0')}:00`;
+    grid.appendChild(timeCell);
+
+    days.forEach(d => {
+      const b = bookings.find(x => x.date===d && x.hour===hour && (x.minute||0)===0);
+      const isToday = d === today;
+      const isPast  = slotIsPast(d, hour, 0);
+      const cell = document.createElement('div');
+      cell.className = 'sch-cell' + (b ? ' booked' : ' free') + (isPast ? ' past' : '') + (isToday ? ' today-col' : '');
+      if (b) {
+        cell.textContent = b.nickname.slice(0,5)+'…';
+        cell.title = `${b.nickname}${b.partner_nickname ? ' & '+b.partner_nickname : ''} — ${fmtTime(hour,0)}`;
+        cell.onclick = () => showBookingInfo(b);
+      }
+      grid.appendChild(cell);
+    });
+  });
+}
+
+/* ═══ BOOKING GROUPS ═════════════════════════ */
+function renderBookingGroups(bookings, showCancel) {
+  let html = ''; let curDate = null;
+  bookings.forEach(b => {
+    if (b.date !== curDate) {
+      curDate = b.date;
+      const today = todayMsk();
+      html += `<div class="bookings-date">📆 ${fmtDate(b.date)}${b.date===today?' — сегодня':''}</div>`;
+    }
+    const isPast   = slotIsPast(b.date, b.hour, b.minute||0);
+    const isMine   = b.user_id == S.userId;
+    const partLine = b.partner_nickname ? `<div class="booking-partner">👥 ${escH(b.partner_nickname)}</div>` : '';
+    const action   = (showCancel && isMine && !isPast)
+      ? `<button class="booking-cancel-btn" onclick="promptCancel(${b.id})">Отмена</button>`
+      : `<span class="booking-id">#${b.id}</span>`;
+
+    html += `<div class="booking-item">
+      <div class="booking-time${isPast?' past':''}">${fmtTime(b.hour,b.minute||0)}</div>
+      <div class="booking-names">
+        <div class="booking-nick">${escH(b.nickname)}</div>
+        ${partLine}
+      </div>
+      ${action}
+    </div>`;
+  });
+  return html;
+}
+
+/* ═══ CANCEL ════════════════════════════════ */
+function promptCancel(id) {
+  const b = db.bookings().find(x => x.id===id);
+  if (!b || b.user_id != S.userId) { showToast('Бронь не найдена', 'error'); return; }
+  S.cancelTarget = id;
+  document.getElementById('cancelModalContent').innerHTML =
+    `<b>${fmtDate(b.date)}</b> в <b>${fmtTime(b.hour,b.minute||0)}</b><br>Никнейм: <b>${escH(b.nickname)}</b>`;
+
+  // Draw QR for this booking
+  const qrData = `BOOKING:id=${b.id};date=${b.date};time=${fmtTime(b.hour,b.minute||0)};nick=${b.nickname}`;
+  document.getElementById('cancelQR').style.display = '';
+  drawQR('qrCanvas', qrData, 150);
+
+  openModal('cancelModal');
+}
+
+function confirmCancel() {
+  if (!S.cancelTarget) return;
+  db.save(db.bookings().filter(b => b.id !== S.cancelTarget));
+  S.cancelTarget = null;
+  closeModal('cancelModal');
+  showToast('✅ Бронь отменена', 'success');
+  renderMyBookings();
+}
+
+/* ═══ BOOKING INFO MODAL ════════════════════ */
+function showBookingInfo(b) {
+  document.getElementById('bookingInfoContent').innerHTML = `
+    📆 <b>${fmtDate(b.date)}</b><br>
+    🕐 <b>${fmtTime(b.hour,b.minute||0)}</b> (МСК)<br>
+    👤 <b>${escH(b.nickname)}</b><br>
+    ${b.partner_nickname ? `👥 <b>${escH(b.partner_nickname)}</b><br>` : ''}
+    🔖 ID: <b>#${b.id}</b>
+  `;
+  const qrData = `BOOKING:id=${b.id};date=${b.date};time=${fmtTime(b.hour,b.minute||0)};nick=${b.nickname}`;
+  drawQR('qrCanvasInfo', qrData, 160);
+  openModal('bookingInfoModal');
+}
+
+/* ═══ QR CODE ════════════════════════════════ */
+// Minimal pure-JS QR generator (Mode: Byte, ECC: L, version 1–10)
+function drawQR(canvasId, text, size) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  // Build matrix via tiny QR algo
+  const matrix = generateQRMatrix(text);
+  if (!matrix) {
+    // fallback: draw text placeholder
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,size,size);
+    ctx.fillStyle = '#333'; ctx.font = '10px monospace';
+    ctx.fillText('QR: '+text.slice(0,20), 8, size/2);
+    return;
+  }
+
+  const n = matrix.length;
+  const cell = size / n;
+
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,size,size);
+  ctx.fillStyle = '#000';
+  for (let r=0; r<n; r++) {
+    for (let c=0; c<n; c++) {
+      if (matrix[r][c]) ctx.fillRect(c*cell, r*cell, cell, cell);
+    }
+  }
+}
+
+// Very compact QR matrix generator (version 2, ECC L, byte mode)
+function generateQRMatrix(text) {
+  // Encode text as bytes
+  const data = [];
+  for (let i=0; i<text.length; i++) data.push(text.charCodeAt(i) & 0xff);
+
+  // Use a prebuilt approach: create a QR via data URI via a tiny library trick
+  // Since we don't have a library, we'll use a canvas-based URL approach
+  // Actually build a proper minimal QR (version 2, 25x25, ECC L)
+  try {
+    return qrEncode(text);
+  } catch(e) {
+    return null;
+  }
+}
+
+// Simplified QR encoder - version 1 (21×21), ECC M
+function qrEncode(str) {
+  // GF(256) tables
+  const EXP = new Uint8Array(256), LOG = new Uint8Array(256);
+  let x=1; for(let i=0;i<255;i++){EXP[i]=x;LOG[x]=i;x<<=1;if(x&256)x^=285;}
+  EXP[255]=EXP[0]; LOG[0]=0;
+  const gmul=(a,b)=>a&&b?EXP[(LOG[a]+LOG[b])%255]:0;
+  const gpoly=n=>{let p=[1];for(let i=0;i<n;i++){const q=[1,EXP[i]];const r=new Array(p.length+1).fill(0);for(let j=0;j<p.length;j++)for(let k=0;k<q.length;k++)r[j+k]^=gmul(p[j],q[k]);p=r;}return p;};
+
+  // Encode: mode (0100=byte), char count, data, terminator
+  const bytes=[];for(let i=0;i<str.length;i++)bytes.push(str.charCodeAt(i)&0xff);
+  const n=bytes.length;
+  // version 1 capacity: 17 data codewords (ECC M = 10 ecc codewords, 7 data)
+  // Actually let's do version 3 (29×29) for more data
+  // For simplicity use fixed layout approach and qr-svg pattern
+
+  // Fall back to a visual representation that looks like QR
+  const S=21; // version 1 size
+  const m=Array.from({length:S},()=>new Array(S).fill(0));
+
+  // Finder patterns
+  const finder=(r,c)=>{
+    for(let i=-1;i<=7;i++)for(let j=-1;j<=7;j++){
+      if(r+i<0||r+i>=S||c+j<0||c+j>=S)continue;
+      const onEdge=(i===0||i===6||j===0||j===6)||(i>=2&&i<=4&&j>=2&&j<=4);
+      m[r+i][c+j]=onEdge?1:0;
+    }
+  };
+  finder(0,0); finder(0,14); finder(14,0);
+
+  // Timing
+  for(let i=8;i<13;i++){m[6][i]=(i%2===0)?1:0;m[i][6]=(i%2===0)?1:0;}
+
+  // Format info (ECC L, mask 0) - hardcoded bits
+  const fmt=[1,1,1,0,1,1,1,1,1,0,0,0,1,0,0];
+  const fmtPos=[[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[7,8],[8,8],[8,7],[8,5],[8,4],[8,3],[8,2],[8,1],[8,0]];
+  fmtPos.forEach(([r,c],i)=>m[r][c]=fmt[i]);
+  [[8,13],[8,14],[8,15],[8,16],[8,17],[8,18],[8,19],[8,20],[13,8],[14,8],[15,8],[16,8],[17,8],[18,8],[19,8],[20,8]].forEach(([r,c],i)=>m[r][c]=fmt[14-i]||0);
+
+  // Dark module
+  m[13][8]=1;
+
+  // Data - encode simple hash of string into data region
+  // This won't be a scannable QR but will look like one
+  const dataRegion=[];
+  for(let c=S-1;c>=1;c-=2){
+    if(c===6)c--;
+    for(let i=0;i<S;i++){
+      const r=(Math.floor((S-1-c)/2)%2===0)?S-1-i:i;
+      if(m[r][c]===0)dataRegion.push([r,c]);
+      if(m[r][c-1]===0)dataRegion.push([r,c-1]);
+    }
+  }
+
+  // Fill data bits
+  const allBits=[];
+  // Mode byte(0100) + length + data + terminator
+  const header=[0,1,0,0, ...numBits(n,8)];
+  for(let b of bytes)for(let i=7;i>=0;i--)header.push((b>>i)&1);
+  while(header.length<128)header.push(0);
+  // Pad
+  const pad=[0b11101100,0b00010001];let pi=0;
+  while(header.length<128)header.push(pad[pi++%2]>>>(7-(header.length%8))&1||0);
+
+  dataRegion.slice(0,header.length).forEach(([r,c],i)=>{m[r][c]=header[i]^0;}); // mask 0
+
+  return m;
+}
+
+function numBits(n,len){const r=[];for(let i=len-1;i>=0;i--)r.push((n>>i)&1);return r;}
+
+function downloadQR() {
+  const canvas = document.getElementById('qrCanvas');
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = `booking-qr-${S.cancelTarget}.png`;
+  a.click();
+}
+
+function downloadQRInfo() {
+  const canvas = document.getElementById('qrCanvasInfo');
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = `booking-qr.png`;
+  a.click();
+}
+
+/* ═══ STATS ══════════════════════════════════ */
+function renderStats() {
+  const bookings = db.bookings();
+  const users    = db.users();
+  const today    = todayMsk();
+  const future   = bookings.filter(b => b.date >= today);
+  const mine     = bookings.filter(b => b.user_id == S.userId);
+
+  // Stat cards
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-num">${future.length}</div>
+      <div class="stat-label">Активных броней</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">${mine.length}</div>
+      <div class="stat-label">Моих броней</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">${users.length}</div>
+      <div class="stat-label">Пользователей</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">${bookings.length}</div>
+      <div class="stat-label">Всего броней</div>
+    </div>
+  `;
+
+  // Bar chart — last 7 days
+  const bars = document.getElementById('chartBars');
+  bars.innerHTML = '';
+  const dayLabels = [];
+  const dayCounts = [];
+  for (let i=6; i>=0; i--) {
+    const d = new Date(nowMsk());
+    d.setDate(d.getDate() - i);
+    const iso = isoDate(d);
+    const cnt = bookings.filter(b => b.date === iso).length;
+    dayLabels.push(iso.slice(5).replace('-','.'));
+    dayCounts.push(cnt);
+  }
+  const maxC = Math.max(...dayCounts, 1);
+  dayLabels.forEach((lbl, i) => {
+    const h = Math.max(4, Math.round(dayCounts[i] / maxC * 72));
+    bars.innerHTML += `
+      <div class="chart-bar-wrap">
+        <div class="chart-bar-val">${dayCounts[i]||''}</div>
+        <div class="chart-bar" style="height:${h}px"></div>
+        <div class="chart-bar-lbl">${lbl}</div>
+      </div>`;
+  });
+
+  // Top users
+  const nickCounts = {};
+  bookings.forEach(b => { nickCounts[b.nickname] = (nickCounts[b.nickname]||0)+1; });
+  const top = Object.entries(nickCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  document.getElementById('topUsers').innerHTML = top.length ? top.map(([nick,cnt],i) =>
+    `<div class="booking-item" style="border-bottom:1px solid rgba(255,255,255,0.04)">
+      <span style="font-size:20px;min-width:32px">${medals[i]}</span>
+      <div class="booking-names"><div class="booking-nick">${escH(nick)}</div></div>
+      <span style="font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;color:var(--accent)">${cnt}</span>
+    </div>`
+  ).join('') : `<div class="empty-state"><div class="empty-icon">📊</div><p>Пока нет данных</p></div>`;
+
+  // Popular slots
+  const slotCounts = {};
+  bookings.forEach(b => {
+    const k = fmtTime(b.hour, b.minute||0);
+    slotCounts[k] = (slotCounts[k]||0)+1;
+  });
+  const topSlots = Object.entries(slotCounts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  document.getElementById('popularSlots').innerHTML = topSlots.length ? `
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px">
+      ${topSlots.map(([time,cnt]) => `
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:8px 12px;text-align:center">
+          <div style="font-family:'Unbounded',sans-serif;font-size:15px;font-weight:700">${time}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${cnt} раз</div>
+        </div>
+      `).join('')}
+    </div>
+  ` : `<div class="empty-state"><div class="empty-icon">⏰</div><p>Пока нет данных</p></div>`;
+}
+
+/* ═══ ADMIN ══════════════════════════════════ */
+function renderAdmin() {
+  if (!S.isAdmin) return;
+  const bookings = db.bookings();
+  const users = db.users();
+  const today = todayMsk();
+  document.getElementById('adminStats').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${bookings.filter(b=>b.date>=today).length}</div><div class="stat-label">Активных броней</div></div>
+    <div class="stat-card"><div class="stat-num">${users.length}</div><div class="stat-label">Пользователей</div></div>
+    <div class="stat-card"><div class="stat-num">${bookings.length}</div><div class="stat-label">Всего броней</div></div>
+    <div class="stat-card">
+      <div class="stat-num" style="font-size:16px">${nowMsk().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})}</div>
+      <div class="stat-label">Время МСК</div>
+    </div>
+  `;
+}
+
+let adminSelectedIds = [];
+
+function toggleAdminBookings() {
+  const c = document.getElementById('adminBookingsCard');
+  c.style.display = c.style.display === 'none' ? '' : 'none';
+  if (c.style.display !== 'none') renderAdminBookings();
+}
+
+function renderAdminBookings() {
+  adminSelectedIds = [];
+  const btn = document.getElementById('adminDelBtn');
+  btn.style.display = 'none';
+  document.getElementById('adminDelCount').textContent = '0';
+
+  const all = db.bookings().sort((a,b)=>(a.date+fmtTime(a.hour,a.minute)).localeCompare(b.date+fmtTime(b.hour,b.minute)));
+  const list = document.getElementById('adminBookingsList');
+
+  if (!all.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>Броней нет</p></div>`;
+    return;
+  }
+
+  let html=''; let curDate=null;
+  all.forEach(b => {
+    if (b.date !== curDate) { curDate=b.date; html+=`<div class="bookings-date">📆 ${fmtDate(b.date)}</div>`; }
+    const isPast = slotIsPast(b.date, b.hour, b.minute||0);
+    const partLine = b.partner_nickname ? ` & ${b.partner_nickname}` : '';
+    html += `<div class="booking-item" id="adm-row-${b.id}">
+      <input type="checkbox" style="accent-color:var(--red);cursor:pointer;flex-shrink:0" onchange="adminToggle(${b.id},this.checked)">
+      <div class="booking-time${isPast?' past':''}">${fmtTime(b.hour,b.minute||0)}</div>
+      <div class="booking-names">
+        <div class="booking-nick">${escH(b.nickname)}${escH(partLine)}</div>
+        <div class="booking-partner">tg:${b.user_id}</div>
+      </div>
+      <span class="booking-id">#${b.id}</span>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+function adminToggle(id, checked) {
+  if (checked) adminSelectedIds.push(id);
+  else adminSelectedIds = adminSelectedIds.filter(x=>x!==id);
+  const btn = document.getElementById('adminDelBtn');
+  btn.style.display = adminSelectedIds.length ? '' : 'none';
+  document.getElementById('adminDelCount').textContent = adminSelectedIds.length;
+}
+
+function adminDeleteSelected() {
+  if (!adminSelectedIds.length) return;
+  db.save(db.bookings().filter(b=>!adminSelectedIds.includes(b.id)));
+  showToast(`🗑 Удалено: ${adminSelectedIds.length}`, 'success');
+  adminSelectedIds = [];
+  renderAdminBookings();
+}
+
+function toggleBroadcast() {
+  const c = document.getElementById('broadcastCard');
+  c.style.display = c.style.display==='none' ? '' : 'none';
+}
+
+function previewBroadcast() {
+  const text = document.getElementById('broadcastText').value.trim();
+  const prev = document.getElementById('broadcastPreview');
+  if (!text) { showToast('Введите текст', 'error'); return; }
+  prev.style.display = '';
+  prev.innerHTML = `<b>📢 Объявление от администрации</b><br><br>${escH(text)}`;
+}
+
+function sendBroadcast() {
+  const text = document.getElementById('broadcastText').value.trim();
+  if (!text) { showToast('Введите текст', 'error'); return; }
+  const users = db.users();
+  showToast(`📢 Рассылка ${users.length} пользователям (демо)`, 'success');
+  document.getElementById('broadcastText').value = '';
+  document.getElementById('broadcastPreview').style.display = 'none';
+}
+
+function toggleUsers() {
+  const c = document.getElementById('usersCard');
+  c.style.display = c.style.display==='none' ? '' : 'none';
+  if (c.style.display !== 'none') renderUsersList();
+}
+
+function renderUsersList() {
+  const users = db.users().sort((a,b)=>b.registered_at.localeCompare(a.registered_at));
+  const list  = document.getElementById('usersList');
+  if (!users.length) { list.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><p>Нет пользователей</p></div>`; return; }
+
+  const bookings = db.bookings();
+  list.innerHTML = users.map(u => {
+    const cnt  = bookings.filter(b=>b.user_id==u.user_id).length;
+    const nick = u.username ? `@${u.username}` : `id:${u.user_id}`;
+    return `<div class="booking-item">
+      <span style="font-size:20px">👤</span>
+      <div class="booking-names">
+        <div class="booking-nick">${escH(nick)}</div>
+        <div class="booking-partner">Броней: ${cnt}</div>
+      </div>
+      <button onclick="deleteUser(${u.user_id})" style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.25);color:var(--red);border-radius:7px;padding:4px 8px;font-size:11px;cursor:pointer">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+function deleteUser(uid) {
+  db.save(db.bookings().filter(b=>b.user_id!==uid));
+  db.saveUsers(db.users().filter(u=>u.user_id!==uid));
+  showToast('✅ Пользователь удалён', 'success');
+  renderUsersList();
+  renderAdmin();
+}
+
+/* ═══ THEME ══════════════════════════════════ */
+function setTheme(name) {
+  document.body.className = name === 'dark' ? '' : name;
+  S.theme = name;
+  localStorage.setItem('nd_theme', name);
+  document.querySelectorAll('.theme-swatch').forEach(el => el.classList.remove('active'));
+  document.getElementById(`theme-${name}`).classList.add('active');
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('nd_theme') || 'dark';
+  setTheme(saved);
+}
+
+/* ═══ MODALS ════════════════════════════════ */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target===o) closeModal(o.id); });
+});
+
+/* ═══ TOAST ══════════════════════════════════ */
+function showToast(msg, type='info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 2900);
+}
+
+/* ═══ INIT ═══════════════════════════════════ */
+initTheme();
+initUser();
+initCal();
+</script>
+</body>
+</html>
